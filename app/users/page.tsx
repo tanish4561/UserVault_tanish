@@ -37,17 +37,30 @@ export default function UsersPage() {
   // Modal state management
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [deletingUser, setDeletingUser] = useState<User | null>(null)
+  const [email, setEmail] = useState("");
 
   // Optimistic update tracking
   const [optimisticDeletes, setOptimisticDeletes] = useState<OptimisticDelete[]>([])
 
   // Check for authentication and fetch initial data
   useEffect(() => {
-    const token = localStorage.getItem("auth_token")
-    if (!token) {
-      router.push("/login")
-      return
+const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+      const [key, value] = cookie.split("=");
+      acc[key] = value;
+      return acc;
+    }, {} as Record<string, string>);
+
+
+    if (!cookies.auth_token) {
+      router.push("/login");
     }
+    else {
+      // Redirect if email not found (optional)
+      if (cookies.user_email) {
+        setEmail(cookies.user_email);
+    }
+  }
+
 
     fetchUsers(1)
   }, [router])
@@ -257,8 +270,17 @@ export default function UsersPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {loading
                 ? renderSkeletons()
+                // : filteredUsers.map((user) => (
+                //     <UserCard key={user.id} user={user} onEdit={handleEditUser} onDelete={handleDeleteClick} />
+                //   ))}
                 : filteredUsers.map((user) => (
-                    <UserCard key={user.id} user={user} onEdit={handleEditUser} onDelete={handleDeleteClick} />
+                  <UserCard 
+                  key={user.id} 
+                  user={user} 
+                  currentUserEmail={email} // Pass the logged-in user's email
+                  onEdit={handleEditUser} 
+                  onDelete={handleDeleteClick} 
+                />
                   ))}
             </div>
           )}

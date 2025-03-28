@@ -40,7 +40,7 @@ export default function LoginPage() {
 
       // Store token in cookies (client-side)
       document.cookie = `auth_token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`
-
+      document.cookie = `user_email=${email}; path=/; max-age=${60 * 60 * 24 * 7}`;
       // Also store in localStorage as a backup
       localStorage.setItem("auth_token", data.token)
 
